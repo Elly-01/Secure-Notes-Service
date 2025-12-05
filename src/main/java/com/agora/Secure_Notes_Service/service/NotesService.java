@@ -2,6 +2,7 @@ package com.agora.Secure_Notes_Service.service;
 
 import com.agora.Secure_Notes_Service.model.Notes;
 import com.agora.Secure_Notes_Service.repository.NotesRepository;
+import com.agora.Secure_Notes_Service.util.EncryptionUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,37 +35,47 @@ public class NotesService {
             return Optional.empty();
         }
 
-        Notes newNote = new Notes(title, content);
+        String encryptedContent = EncryptionUtil.encrypt(content);
+        Notes newNote = new Notes(title, encryptedContent);
         noteRepository.save(newNote);
+
+        newNote.setContent(EncryptionUtil.decrypt(newNote.getContent()));
         return Optional.of(newNote);
     }
 
     public List<Notes> getAllNotes() {
-        return noteRepository.findAll();
+        List<Notes> notes = noteRepository.findAll();
+        notes.forEach(n ->
+                n.setContent(EncryptionUtil.decrypt(n.getContent()))
+        );
+        return notes;
     }
 
     public Optional<Notes> getNoteById(Long id) {
-        return noteRepository.findById(id);
+        Optional<Notes> note = noteRepository.findById(id);
+        if (note.isPresent()) {
+            note.get().setContent(EncryptionUtil.decrypt(note.get().getContent()));
+        }
+        return note;
     }
 
     public Optional<Notes> updateNoteById(Long id, Map<String, Object> updates) {
-        String title;
-        String content;
 
         Optional<Notes> existing = noteRepository.findById(id);
         if (existing.isEmpty()) {return Optional.empty();}
 
         if (updates.get("title") != null && updates.get("title") instanceof String newTitle) {
-            title = newTitle;
-            existing.get().setTitle(title);
+            existing.get().setTitle(newTitle);
         }
         if (updates.get("content") != null && updates.get("content") instanceof String newContent) {
-            content = newContent;
-            existing.get().setContent(content);
+            existing.get().setContent(EncryptionUtil.encrypt(newContent));
         }
 
         Notes saved = noteRepository.save(existing.get());
-        return Optional.of(saved);
+        if (existing.isPresent()) {
+            existing.get().setContent(EncryptionUtil.decrypt(existing.get().getContent()));
+        }
+        return existing;
     }
 
 
