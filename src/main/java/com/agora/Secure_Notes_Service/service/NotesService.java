@@ -20,23 +20,29 @@ public class NotesService {
     }
 
     public Optional<Notes> createNote(Map<String, Object> note) {
-        String title;
-        String content;
-
         //validation
-        if (note.get("title") != null && note.get("title") instanceof String newTitle) {
-            title = newTitle;
-        } else {
-            return Optional.empty();
-        }
-        if (note.get("content") != null && note.get("content") instanceof String newContent) {
-            content = newContent;
-        } else {
+        Object rawTitle = note.get("title");
+        Optional<String> title = Optional.ofNullable(rawTitle)
+            .filter(String.class::isInstance)
+            .map(String.class::cast)
+            .map(String::trim)
+            .filter(s -> !s.isBlank() && s.length() <= 255);
+        if (title.isEmpty()) {
             return Optional.empty();
         }
 
-        String encryptedContent = EncryptionUtil.encrypt(content);
-        Notes newNote = new Notes(title, encryptedContent);
+        Object rawContent = note.get("content");
+        Optional<String> content = Optional.ofNullable(rawContent)
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .map(String::trim)
+                .filter(s -> !s.isBlank() && s.length() <= 255);
+        if (content.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String encryptedContent = EncryptionUtil.encrypt(content.get());
+        Notes newNote = new Notes(title.get(), encryptedContent);
         noteRepository.save(newNote);
 
         newNote.setContent(EncryptionUtil.decrypt(newNote.getContent()));
@@ -64,17 +70,26 @@ public class NotesService {
         Optional<Notes> existing = noteRepository.findById(id);
         if (existing.isEmpty()) {return Optional.empty();}
 
-        if (updates.get("title") != null && updates.get("title") instanceof String newTitle) {
-            existing.get().setTitle(newTitle);
-        }
-        if (updates.get("content") != null && updates.get("content") instanceof String newContent) {
-            existing.get().setContent(EncryptionUtil.encrypt(newContent));
-        }
+        //validation
+        Object rawTitle = updates.get("title");
+        Optional.ofNullable(rawTitle)
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .map(String::trim)
+                .filter(s -> !s.isBlank() && s.length() <= 255)
+                .ifPresent(title -> existing.get().setTitle(title));
 
-        Notes saved = noteRepository.save(existing.get());
-        if (existing.isPresent()) {
-            existing.get().setContent(EncryptionUtil.decrypt(existing.get().getContent()));
-        }
+        Object rawContent = updates.get("content");
+        Optional.ofNullable(rawContent)
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .map(String::trim)
+                .filter(s -> !s.isBlank() && s.length() <= 255)
+                .ifPresent(content -> existing.get().setContent(EncryptionUtil.encrypt(content)));
+
+
+        noteRepository.save(existing.get());
+        existing.get().setContent(EncryptionUtil.decrypt(existing.get().getContent()));
         return existing;
     }
 

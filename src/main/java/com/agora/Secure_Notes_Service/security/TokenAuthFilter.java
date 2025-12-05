@@ -22,12 +22,17 @@ public class TokenAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        System.out.println("VALID TOKEN: ");
-        System.out.println(validToken);
+//        Debug
+//        System.out.println("VALID TOKEN: ");
+//        System.out.println(validToken);
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             if (request.getRequestURI().startsWith("/h2-console")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (request.getRequestURI().startsWith("/health")) {
                 filterChain.doFilter(request, response);
                 return;
             }

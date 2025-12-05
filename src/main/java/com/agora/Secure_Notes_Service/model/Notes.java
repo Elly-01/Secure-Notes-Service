@@ -19,7 +19,7 @@ public class Notes {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Constructors
+
     protected Notes() {}
 
     public Notes(String title, String content) {
@@ -29,7 +29,7 @@ public class Notes {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Getters and setters
+
     public Long getId() { return id; }
 
     public String getTitle() { return title; }
