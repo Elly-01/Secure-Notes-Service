@@ -38,11 +38,35 @@ public class NotesController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<Notes>> getAllNotes() {
         List<Notes> notes = notesService.getAllNotes();
         if (!notes.isEmpty()) {
             return ResponseEntity.ok(notes);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Notes> updateNote(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        Optional<Notes> updatedNote = notesService.updateNoteById(id, updates);
+
+        if (updatedNote.isPresent()) {
+            return ResponseEntity.ok(updatedNote.get()); // 200 with updated note
+        } else {
+            return ResponseEntity.notFound().build();    // 404 if not found
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNoteById(@PathVariable Long id) {
+        boolean deleted = notesService.deleteNoteById(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }

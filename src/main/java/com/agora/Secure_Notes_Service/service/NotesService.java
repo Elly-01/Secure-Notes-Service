@@ -4,6 +4,7 @@ import com.agora.Secure_Notes_Service.model.Notes;
 import com.agora.Secure_Notes_Service.repository.NotesRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,24 +21,15 @@ public class NotesService {
     public Optional<Notes> createNote(Map<String, Object> note) {
         String title;
         String content;
+
         //validation
-        if (note.get("title") != null) {
-            String newTitle = note.get("title").toString();
-            if (!Objects.equals(newTitle, "")) {
-                title = newTitle;
-            } else {
-                return Optional.empty();
-            }
+        if (note.get("title") != null && note.get("title") instanceof String newTitle) {
+            title = newTitle;
         } else {
             return Optional.empty();
         }
-        if (note.get("content") != null) {
-            String newContent = note.get("content").toString();
-            if (!Objects.equals(newContent, "")) {
-                content = newContent;
-            } else {
-                return Optional.empty();
-            }
+        if (note.get("content") != null && note.get("content") instanceof String newContent) {
+            content = newContent;
         } else {
             return Optional.empty();
         }
@@ -55,11 +47,32 @@ public class NotesService {
         return noteRepository.findById(id);
     }
 
-    public Notes updateNote(Notes note) {
-        return noteRepository.save(note);
+    public Optional<Notes> updateNoteById(Long id, Map<String, Object> updates) {
+        String title;
+        String content;
+
+        Optional<Notes> existing = noteRepository.findById(id);
+        if (existing.isEmpty()) {return Optional.empty();}
+
+        if (updates.get("title") != null && updates.get("title") instanceof String newTitle) {
+            title = newTitle;
+            existing.get().setTitle(title);
+        }
+        if (updates.get("content") != null && updates.get("content") instanceof String newContent) {
+            content = newContent;
+            existing.get().setContent(content);
+        }
+
+        Notes saved = noteRepository.save(existing.get());
+        return Optional.of(saved);
     }
 
-    public void deleteNoteById(Long id) {
-        noteRepository.deleteById(id);
+
+    public boolean deleteNoteById(Long id) {
+        if (noteRepository.existsById(id)) {
+            noteRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
