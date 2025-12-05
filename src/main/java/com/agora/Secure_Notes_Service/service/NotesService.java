@@ -5,10 +5,9 @@ import com.agora.Secure_Notes_Service.repository.NotesRepository;
 import com.agora.Secure_Notes_Service.util.EncryptionUtil;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
