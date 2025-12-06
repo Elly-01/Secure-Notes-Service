@@ -54,19 +54,22 @@ This ensures that only meaningful, properly formatted data is persisted.
 `git clone https://github.com/Elly-01/Secure-Notes-Service.git`  
 `git clone git@github.com:Elly-01/Secure-Notes-Service.git`
 
-2. Configure Environment Variables  
-Either locally on your machine or on the preferred IDE
+2. Open the project with IntelliJ and select Java 21
 
 3. Install Maven if you don't have it already
 
-3. Build the Project    
-`mvn install -f pom.xml`  
-`mvn compile -f pom.xml`
+4. Build the Project  
+In the Maven panel on the right, expand the project and select:
+   - clean
+   - compile
+   - install
 
-4. Run the Application  
-`mvn spring-boot:run`
+5. Configure Environment Variables   
+Go to Run → Edit Configurations, select your run configuration, and add them
 
-5. Access Endpoints  
+6. Run the configuration in which you put the environment variables 
+
+7. Access Endpoints  
 All endpoints require the header: Authorization: Bearer YOUR_API_TOKEN
    - POST  /api/notes – Create a note
    - GET  /api/notes – Get all notes
@@ -75,7 +78,5 @@ All endpoints require the header: Authorization: Bearer YOUR_API_TOKEN
    - DELETE  /api/notes/{id} – Delete a note
    - GET  /health – Health check (no token required)
 
-6. Run Test classes separately  
-`mvn test -Dtest=NotesTest`  
-`mvn test -Dtest=TokenAuthFilterTest`  
-`mvn test -Dtest=NotesServiceTest`  
+8. Run Tests  
+In the Maven panel, expand and select test

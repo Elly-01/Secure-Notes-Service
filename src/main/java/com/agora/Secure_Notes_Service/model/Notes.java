@@ -19,9 +19,10 @@ public class Notes {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
+    // Default constructor for JPA
     protected Notes() {}
 
+    // Constructor with parameters
     public Notes(String title, String content) {
         this.title = title;
         this.content = content;
@@ -29,7 +30,7 @@ public class Notes {
         this.updatedAt = LocalDateTime.now();
     }
 
-
+    // Getters and Setters
     public Long getId() { return id; }
 
     public String getTitle() { return title; }
